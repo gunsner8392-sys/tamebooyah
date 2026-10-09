@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TAME BOOYAH</title>
+
+<!-- External Resources -->
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,600;0,700;0,800;1,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="icon" type="image/webp" href="PG/LOGO-S1.webp">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<!-- Custom Stylesheet -->
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="text-slate-100 min-h-screen selection:bg-orange-500 selection:text-white">
+
+<div id="app" class="w-full min-h-screen flex flex-col justify-between">
+  
+  <!-- HEADER / TOP NAVIGATION BAR -->
+  <header id="mode-selector-bar" class="bg-[#12151e] border-b border-orange-500/30 sticky top-0 z-40 px-4 lg:px-8 py-3 flex justify-between items-center shadow-lg">
+    <div class="flex items-center space-x-3">
+      <h1 class="text-base sm:text-lg font-bold text-white tracking-wide">
+        ระบบจัดการป้ายชื่อทีม Esports
+      </h1>
+    </div>
+    
+    <!-- ปุ่มสลับโหมดการทำงาน -->
+    <div class="flex items-center bg-[#0b0d12] p-1 rounded-xl border border-orange-500/30">
+      <button onclick="switchView('control')" id="btn-control" class="px-4 py-1.5 text-xs sm:text-sm font-bold rounded-lg bg-orange-600 text-white shadow-md transition-all flex items-center gap-2">
+        <i class="fa-solid fa-sliders"></i> <span>แผงควบคุม</span>
+      </button>
+      <button onclick="switchView('display')" id="btn-display" class="px-4 py-1.5 text-xs sm:text-sm font-bold rounded-lg text-slate-400 hover:text-white transition-all flex items-center gap-2">
+        <i class="fa-solid fa-tv"></i> <span>หน้าจอ OBS</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- VIEW 1: CONTROL PANEL -->
+  <main id="view-control" class="flex-1 p-4 md:p-6 max-w-7xl mx-auto w-full space-y-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- ฟอร์มกรอกข้อมูลทีม -->
+      <div class="lg:col-span-7 bg-[#131620] border border-orange-500/30 rounded-2xl p-5 shadow-2xl relative">
+        <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
+            <span class="w-7 h-7 rounded-lg bg-orange-500/20 border border-orange-500/40 flex items-center justify-center text-orange-400 text-xs">
+              <i class="fa-solid fa-pen"></i>
+            </span>
+            ตั้งค่าข้อมูลทีม & ข้อความ
+          </h2>
+        </div>
+
+        <form id="team-form" class="space-y-4" onsubmit="event.preventDefault();">
+          <!-- ธีมสี -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">เลือกธีมสีป้าย (Color Theme)</label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="theme-selector-container"></div>
+          </div>
+
+          <!-- ชื่อทีม บรรทัด 1 & 2 -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">ชื่อทีม (บรรทัดที่ 1)</label>
+              <input type="text" id="input-team-line1" value="" class="w-full bg-[#0b0d12] border border-slate-800 rounded-xl px-3.5 py-2 text-white focus:outline-none focus:border-orange-500 font-bold tracking-wide transition text-sm" placeholder="พิมพ์ชื่อทีมบรรทัดที่ 1..." oninput="handleInputLiveUpdate()">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">ชื่อทีม (บรรทัดที่ 2)</label>
+              <input type="text" id="input-team-line2" value="" class="w-full bg-[#0b0d12] border border-slate-800 rounded-xl px-3.5 py-2 text-white focus:outline-none focus:border-orange-500 font-bold tracking-wide transition text-sm" placeholder="พิมพ์ชื่อทีมบรรทัดที่ 2..." oninput="handleInputLiveUpdate()">
+            </div>
+          </div>
+
+          <!-- ข้อความป้าย Badge -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">ข้อความป้ายขวา (Badge Text)</label>
+            <input type="text" id="input-booyah" value="BOOYAH!" class="w-full bg-[#0b0d12] border border-slate-800 rounded-xl px-3.5 py-2 text-orange-400 font-black tracking-wider focus:outline-none focus:border-orange-500 transition text-sm" placeholder="BOOYAH!" oninput="handleInputLiveUpdate()">
+            <div class="flex flex-wrap gap-1.5 mt-2">
+              <button type="button" onclick="setQuickBooyah('BOOYAH!')" class="px-2.5 py-1 bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-lg text-xs font-bold hover:bg-orange-500/30 transition">BOOYAH!</button>
+              <button type="button" onclick="setQuickBooyah('WINNER!')" class="px-2.5 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-xs font-bold hover:bg-emerald-500/30 transition">WINNER!</button>
+              <button type="button" onclick="setQuickBooyah('MATCH DAY')" class="px-2.5 py-1 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-lg text-xs font-bold hover:bg-blue-500/30 transition">MATCH DAY</button>
+              <button type="button" onclick="setQuickBooyah('CHAMPION')" class="px-2.5 py-1 bg-purple-500/20 text-purple-400 border border-purple-500/30 rounded-lg text-xs font-bold hover:bg-purple-500/30 transition">CHAMPION</button>
+            </div>
+          </div>
+
+          <!-- โลโก้ Drag & Drop & ประวัติโลโก้ -->
+          <div class="pt-2 border-t border-slate-800">
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">อัปโหลดโลโก้ทีม (Upload / Drag & Drop)</label>
+            
+            <!-- Drag & Drop Zone -->
+            <div id="drop-zone" class="border-2 border-dashed border-slate-700 hover:border-orange-500 rounded-xl p-5 text-center cursor-pointer transition-all bg-[#0b0d12] flex flex-col items-center justify-center gap-2 group">
+              <i class="fa-solid fa-cloud-arrow-up text-3xl text-orange-400 group-hover:scale-110 transition-transform"></i>
+              <div class="text-xs text-slate-300 font-semibold">
+                ลากไฟล์รูปภาพมาวางที่นี่ หรือ <span class="text-orange-400 underline">คลิกเพื่อเลือกไฟล์</span>
+              </div>
+              <span class="text-[10px] text-slate-500">รองรับไฟล์ PNG, JPG, WEBP, GIF</span>
+              <input type="file" id="input-file-logo" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+            </div>
+            
+            <input type="hidden" id="input-logo-url" value="">
+
+            <!-- ส่วนแสดงประวัติโลโก้ (Logo History) -->
+            <div class="mt-4 bg-[#0b0d12] p-3 rounded-xl border border-slate-800">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold text-slate-400 flex items-center gap-1.5">
+                  <i class="fa-solid fa-clock-rotate-left text-orange-400"></i> ประวัติโลโก้ที่เคยใช้ (ซิงค์ออนไลน์ทุกเครื่อง)
+                </span>
+                <button type="button" onclick="clearLogoHistory()" class="text-[10px] text-slate-500 hover:text-red-400 transition flex items-center gap-1">
+                  <i class="fa-solid fa-trash-can"></i> ล้างประวัติ
+                </button>
+              </div>
+              <div id="logo-history-list" class="flex items-center gap-2 overflow-x-auto pb-1 min-h-[50px]"></div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- ส่วนขวา: ตัวอย่างการแสดงผล & ลิงก์ OBS -->
+      <div class="lg:col-span-5 space-y-4">
+        <!-- Live Preview -->
+        <div class="bg-[#131620] border border-orange-500/30 rounded-2xl p-5 shadow-2xl">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-xs font-bold text-slate-200 flex items-center gap-2 uppercase tracking-wider">
+              <i class="fa-solid fa-eye text-orange-400"></i>
+              <span>ตัวอย่างแสดงผล (Live Preview)</span>
+            </h3>
+          </div>
+
+          <div class="bg-black/90 border border-slate-800 rounded-xl p-4 min-h-[300px] flex items-center justify-center relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:12px_12px]"></div>
+            <div id="mini-preview-container" class="transform scale-[0.6] sm:scale-[0.65] origin-center transition-all"></div>
+          </div>
+        </div>
+
+        <!-- OBS Link Generator -->
+        <div class="bg-[#131620] border border-orange-500/30 rounded-2xl p-4 shadow-2xl">
+          <h3 class="text-xs font-bold mb-1.5 text-orange-400 flex items-center gap-2 uppercase tracking-wider">
+            <i class="fa-solid fa-link"></i>
+            <span>OBS Browser Source Link</span>
+          </h3>
+          <p class="text-[11px] text-slate-400 mb-3">คัดลอกลิงก์ใส่ใน OBS Studio เลือก Browser Source (ซิงค์ข้อมูลผ่าน Firebase แบบเรียลไทม์)</p>
+          <div class="relative mb-2">
+            <input type="text" id="obs-link-output" readonly class="w-full bg-[#0b0d12] border border-slate-800 rounded-xl pl-3 pr-10 py-2 text-xs text-slate-300 font-mono focus:outline-none">
+            <button onclick="copyObsLink()" class="absolute right-1 top-1 bottom-1 bg-orange-600 hover:bg-orange-500 text-white px-3 rounded-lg text-xs font-bold transition">
+              <i class="fa-solid fa-copy"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- แถบปุ่ม Action ด้านล่าง -->
+    <div class="bg-[#131620] border border-orange-500/40 rounded-2xl p-4 shadow-2xl flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2 flex-wrap">
+        <button onclick="resetDefaults()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold px-4 py-2.5 rounded-xl text-xs transition flex items-center gap-1.5">
+          <i class="fa-solid fa-rotate-right"></i>
+          <span>รีเซ็ตค่าเริ่มต้น</span>
+        </button>
+      </div>
+
+      <div class="flex items-center gap-2 flex-wrap">
+        <a id="open-display-newtab" href="#" target="_blank" class="bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/40 font-bold px-4 py-2.5 rounded-xl text-xs transition flex items-center gap-2">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          <span>เปิด OBS หน้าจอแยก</span>
+        </a>
+
+        <button onclick="copyObsLink()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/40 font-bold px-4 py-2.5 rounded-xl text-xs transition flex items-center gap-2">
+          <i class="fa-solid fa-link"></i>
+          <span>คัดลอก URL OBS</span>
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- VIEW 2: OBS DISPLAY VIEW -->
+  <div id="view-display" class="hidden flex-1 w-full h-screen bg-transparent flex flex-col justify-end items-start p-12 overflow-hidden relative" style="background: transparent !important;">
+    <div id="obs-banner-wrapper" class="flex flex-col items-start select-none obs-floating-container"></div>
+  </div>
+</div>
+
+<!-- แจ้งเตือน Toast Notification -->
+<div id="toast" class="fixed bottom-6 right-6 bg-[#131620] text-white border border-orange-500/50 px-5 py-3 rounded-2xl shadow-2xl font-medium transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3">
+  <div class="w-7 h-7 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center shrink-0">
+    <i class="fa-solid fa-check text-xs"></i>
+  </div>
+  <span id="toast-message" class="text-xs font-bold">ทำรายการเรียบร้อย!</span>
+</div>
+
+<!-- Custom Script -->
+<script src="jss/script.js"></script>
+</body>
+</html>
