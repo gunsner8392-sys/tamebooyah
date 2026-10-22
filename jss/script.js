@@ -263,30 +263,30 @@ function renderBanner(containerId, config, animate = false) {
   const hasTeamText = (config.line1 && config.line1.trim() !== '') || (config.line2 && config.line2.trim() !== '');
 
   container.innerHTML = `
-    <!-- โลโก้ขนาดใหญ่ด้านบน -->
-    <div class="mb-3 z-10 ${animUp} flex justify-start">
+    <!-- โลโก้ขนาดใหญ่ด้านบน (จัดกึ่งกลาง) -->
+    <div class="mb-3 z-10 ${animUp} flex justify-center w-full">
       <div class="w-64 h-64 bg-white border-4 border-orange-500 rounded-2xl p-2 shadow-2xl overflow-hidden flex items-center justify-center animate-big-logo">
         <img src="${config.logoUrl}" alt="Team Logo" class="w-full h-full object-contain rounded-xl" onerror="this.src='${PLACEHOLDER_LOGO}'">
       </div>
     </div>
 
     <!-- แถบแบนเนอร์ด้านล่าง -->
-    <div class="flex items-center z-20">
-      <!-- บล็อกชื่อทีมฝั่งซ้าย -->
-      <div class="flex items-center ${theme.bannerBg} border-2 shadow-2xl esport-banner-clip pr-10 pl-3 py-2.5 ${animLeft}">
+    <div class="flex items-center justify-center z-20 w-full">
+      <!-- บล็อกชื่อทีมฝั่งซ้าย (เว้นระยะขอบขวา pr-14 เพื่อรองรับป้ายขวาที่เลื่อนซ้อนเข้ามา) -->
+      <div class="flex items-center ${theme.bannerBg} border-2 shadow-2xl esport-banner-clip pr-14 pl-3.5 py-2.5 ${animLeft} min-w-[220px] w-auto">
         <div class="w-12 h-12 bg-white rounded-xl border-2 border-orange-400 p-0.5 flex items-center justify-center ${hasTeamText ? 'mr-3' : 'mr-0'} shrink-0 overflow-hidden shadow-md">
           <img src="${config.logoUrl}" alt="Thumb" class="w-full h-full object-contain rounded-lg" onerror="this.src='${PLACEHOLDER_LOGO}'">
         </div>
         ${hasTeamText ? `
-        <div class="flex flex-col mr-2">
+        <div class="flex flex-col mr-2 justify-center whitespace-nowrap">
           ${config.line1 ? `<span class="${theme.line1Color} font-black text-xl tracking-wider leading-none uppercase drop-shadow">${config.line1}</span>` : ''}
           ${config.line2 ? `<span class="${theme.line2Color} font-bold text-xl tracking-wider leading-none mt-1 uppercase drop-shadow">${config.line2}</span>` : ''}
         </div>
         ` : ''}
       </div>
 
-      <!-- บล็อกป้าย Badge ฝั่งขวา -->
-      <div class="${theme.badgeBg} badge-shine-container animate-badge-pulse border-t-2 border-b-2 border-r-2 shadow-2xl esport-booyah-clip px-8 py-3.5 -ml-6 flex items-center justify-center transition-all ${animRight}">
+      <!-- บล็อกป้าย Badge ฝั่งขวา (ใช้ -ml-10 เลื่อนซ้อนเข้าในกรอบซ้ายเพื่อปิดช่องว่างแยก) -->
+      <div class="${theme.badgeBg} badge-shine-container animate-badge-pulse border-t-2 border-b-2 border-r-2 shadow-2xl esport-booyah-clip px-8 py-3.5 -ml-10 flex items-center justify-center transition-all shrink-0 ${animRight}">
         <span class="${theme.badgeText} font-black italic text-3xl tracking-tighter uppercase relative z-10" style="font-style: italic; font-weight: 900; text-shadow: 2px 2px 4px rgba(0,0,0,0.6);">${config.booyah}</span>
       </div>
     </div>
